@@ -45,7 +45,7 @@ export default function App() {
           <ScrollView contentContainerStyle={styles.pageContainer}>
             <Card style={styles.ganttContainer}>
               <Text style={{ margin: 50 }}>Placeholder</Text>
-              <Button onPress={() => setId(34)}>34</Button>
+              <Button onPress={() => { setId(34); setIndex(0) }}>34</Button>
             </Card>
             <View style={styles.bottomContainer}>
               <Card style={styles.detailsContainer} contentStyle={styles.detailsInnerContainer} >
@@ -66,7 +66,7 @@ export default function App() {
                   <TabView.Item>
                     {index == 0 ? <Text>Placeholder</Text> : <></>}
                   </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, flexShrink: 0 }}>
-                    {index == 1 ? <TaskDetails /> : <></>}
+                    {index == 1 ? <TaskDetails id={id} /> : <></>}
                   </TabView.Item><TabView.Item>
                     {index == 2 ? <Text>Placeholder 3</Text> : <></>}
                   </TabView.Item>

@@ -1,29 +1,68 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Card } from 'react-native-paper';
+import { Card, Chip } from 'react-native-paper';
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
 export default function TaskDetails({ id }) {
 
+    const [task, setTask] = useState({});
+
+    useEffect(() => {
+        //forse serve aggiungere una schermatina di caricamento e/o del delay perché la tab non appaia vuota
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        if (id != 0) {
+            let response = await axios.get(`https://gtr-express.onrender.com/task/id/${id}`);
+            console.log(response.data[0]);
+
+            let obj = {};
+
+            obj.ID = response.data[0].ID;
+            obj.description = response.data[0].description;
+            obj.type = response.data[0].text;
+            obj.status = response.data[0].status;
+            obj.commission = response.data[0].commission;
+            obj.ticket = response.data[0].ticket
+            obj.customer = response.data[0].customer;
+            obj.dev_start = response.data[0].dev_start;
+            obj.planned_release = response.data[0].planned_release;
+            obj.estimated_time = response.data[0].estimated_time;
+            obj.actual_time = response.data[0].actual_time;
+            obj.billable_time = response.data[0].billable_time;
+            obj.tags = response.data[0].tags;
+            obj.notes = response.data[0].notes;
+
+            console.log(obj.ID);
+            setTask(obj);
+        }
+    }
 
     return (
         <ScrollView containerStyle={styles.detailsContainer}>
-            <Text style={styles.taskTitle}>ID - Descrizione</Text>
-            <View style={styles.taskProperty}>
-                <Text style={styles.propertyLabel}>Placeholder</Text>
-                <Text style={styles.property}>Placeholder</Text>
+            <Text style={styles.taskTitle}>{task.ID} - {task.description}</Text>
+            <View style={{ flexDirection: 'row' }}>
+                <View style={styles.taskProperty}>
+                    <Text style={styles.propertyLabel}>Stato</Text>
+                    <Chip style={styles.propertyChip}>{task.status}</Chip>
+                </View>
+                <View style={styles.taskProperty}>
+                    <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Tipologia</Text>
+                    <Chip style={styles.propertyChip}>{task.type}</Chip>
+                    {/* <Text style={styles.property}>{task.type}</Text> */}
+                </View>
             </View>
-            <View style={styles.taskProperty}>
-                <Text style={styles.propertyLabel}>Placeholder</Text>
-                <Text style={styles.property}>Placeholder</Text>
-            </View>
-            <View style={styles.taskProperty}>
-                <Text style={styles.propertyLabel}>Placeholder</Text>
-                <Text style={styles.property}>Placeholder</Text>
-            </View>
-            <View style={styles.taskProperty}>
-                <Text style={styles.propertyLabel}>Placeholder</Text>
-                <Text style={styles.property}>Placeholder</Text>
+            <View style={{ flexDirection: 'row' }}>
+                <View style={styles.taskProperty}>
+                    <Text style={styles.propertyLabel}>Commessa</Text>
+                    <Chip style={styles.propertyChip}>{task.commission}</Chip>
+                </View>
+                <View style={styles.taskProperty}>
+                    <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Ticket</Text> {/*rendere dinamico il margine sx se il campo è vuoto*/}
+                    <Chip style={styles.propertyChip}>{task.ticket}</Chip>
+                </View>
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Placeholder</Text>
