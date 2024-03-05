@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Card } from 'react-native-paper';
+import { Card, FAB } from 'react-native-paper';
 import { useState } from 'react';
 
 // Drawer component TEMP
@@ -22,6 +22,7 @@ import TaskDetails from './fragments/taskDetails';
 export default function App() {
   const [index, setIndex] = useState(0);
   const [id, setId] = useState(0);
+  const [editMode, setEditMode] = useState(false);
 
   return (
     <SafeAreaProvider style={styles.safeareaproviderContainer}>
@@ -66,11 +67,26 @@ export default function App() {
                   <TabView.Item>
                     {index == 0 ? <Text>Placeholder</Text> : <></>}
                   </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, flexShrink: 0 }}>
-                    {index == 1 ? <TaskDetails id={id} /> : <></>}
+                    {index == 1 ? <TaskDetails id={id} editMode={editMode} /> : <></>}
                   </TabView.Item><TabView.Item>
                     {index == 2 ? <Text>Placeholder 3</Text> : <></>}
                   </TabView.Item>
                 </TabView>
+                {index == 0 ? <FAB
+                  icon="plus"
+                  style={styles.editButton}
+                  onPress={() => console.log('Pressed')}
+                /> : <></>}
+                {index == 1 ? <FAB
+                  icon={editMode ? "eye-outline" : "pencil-outline"}
+                  style={styles.editButton}
+                  onPress={() => setEditMode(!editMode)}
+                /> : <></>}
+                {index == 2 ? <FAB
+                  icon="plus"
+                  style={styles.editButton}
+                  onPress={() => console.log('Pressed')}
+                /> : <></>}
               </Card>
             </View>
           </ScrollView>
@@ -147,5 +163,11 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     borderRadius: 25,
 
+  },
+  editButton: {
+    position: 'absolute',
+    margin: 16,
+    right: 0,
+    bottom: 0,
   }
 });
