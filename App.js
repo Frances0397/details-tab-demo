@@ -15,6 +15,7 @@ import { Button } from 'react-native-paper';
 
 //Details component TEMP
 import { Tab, TabView } from '@rneui/themed';
+import { AnimatedFAB } from 'react-native-paper';
 
 //Inner components for sub tab
 import TaskDetails from './fragments/taskDetails';
@@ -22,6 +23,7 @@ import TaskDetails from './fragments/taskDetails';
 export default function App() {
   const [index, setIndex] = useState(0);
   const [id, setId] = useState(0);
+  const [extended, isExtended] = useState(false);
 
   return (
     <SafeAreaProvider style={styles.safeareaproviderContainer}>
@@ -71,6 +73,7 @@ export default function App() {
                     {index == 2 ? <Text>Placeholder 3</Text> : <></>}
                   </TabView.Item>
                 </TabView>
+                <AnimatedFAB icon="pencil-outline" style={styles.editButton} label="Modifica" extended={isExtended}></AnimatedFAB>
               </Card>
             </View>
           </ScrollView>
