@@ -69,40 +69,42 @@ export default function TaskDetails({ id, editMode }) {
 
     const fetchStatuses = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/statuses');
-        console.log(res);
-        setStatuses(res);
+        console.log(res.data);
+        setStatuses(res.data);
     }
 
     const fetchTypes = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/types');
-        console.log(res);
-        setTypes(res);
+        console.log(res.data);
+        setTypes(res.data);
     }
 
     const fetchCommissions = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/commissions');
-        console.log(res);
-        setTypes(res);
+        console.log(res.data);
+        setTypes(res.data);
     }
 
     const fetchTickets = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tickets');
-        console.log(res);
-        setTypes(res);
+        console.log(res.data);
+        setTypes(res.data);
     }
 
     const fetchCustomers = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/customers');
-        console.log(res);
-        setTypes(res);
+        console.log(res.data);
+        setTypes(res.data);
     }
 
     const fetchTags = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tags');
-        console.log(res);
-        setTypes(res);
+        console.log(res.data);
+        setTypes(res.data);
     }
 
+
+    //DUMMY
     const data = [
         { label: 'Item 1', value: '1' },
         { label: 'Item 2', value: '2' },
@@ -117,15 +119,21 @@ export default function TaskDetails({ id, editMode }) {
     const [value, setValue] = useState(null);
 
     return (
-        <ScrollView containerStyle={styles.detailsContainer}>
+        <ScrollView containerStyle={styles.detailsContainer} showsVerticalScrollIndicator={false}>
             <Text style={styles.taskTitle}>{task.ID} - {task.description}</Text>
             <View style={{ flexDirection: 'row' }}>
                 <View style={styles.taskProperty}>
                     <Text style={styles.propertyLabel}>Stato</Text>
                     {editMode ?
-                        <View style={{ width: '100%' }}>
-                            {/* <Dropdown style={{ width: '100%' }} data={data} placeholder="Prova" onChange={(item) => { setValue(item.value); }}
-                                value={value} /> */}
+                        <View style={{ width: '100%', minWidth: '80%' }}>
+                            <Dropdown
+                                itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+                                selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+                                selectedTextProps={{ numberOfLines: 1 }}
+                                itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+                                style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={statuses} placeholder="Stato" onChange={(item) => { setValue(item.value); }}
+                                value={status} labelField='description' valueField='ID' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+                                containerStyle={[styles.dropdownList, { borderRadius: 15, left: 342 }]} />
                             {/* <SelectDropdown
                                 style={styles.propertyDropdown}
                                 defaultButtonText="Stato" data={data} rowTextForSelection={(item, index) => { return item.description }}
@@ -141,8 +149,15 @@ export default function TaskDetails({ id, editMode }) {
                 </View>
                 <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Tipologia</Text>
-                    <Chip style={styles.propertyChip}>{task.type}</Chip>
-                    {/* <Text style={styles.property}>{task.type}</Text> */}
+                    {editMode ? <View style={{ width: '100%', minWidth: '80%' }}><Dropdown
+                        itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+                        selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+                        selectedTextProps={{ numberOfLines: 1 }}
+                        itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={types} placeholder="Tipologia" onChange={(item) => { setValue(item.value); }}
+                        value={type} labelField='text' valueField='ID' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 692 }]} /></View> : <Chip style={styles.propertyChip}>{task.type}</Chip>
+                    }
                 </View>
             </View>
             <View style={{ flexDirection: 'row' }}>
@@ -263,7 +278,15 @@ const styles = StyleSheet.create({
         height: '70%'
     },
     propertyDropdown: {
-        height: '70%',
-        backgroundColor: 'red'
+        height: 50,
+        borderColor: 'gray',
+        borderWidth: 0.5,
+        borderRadius: 8,
+        paddingHorizontal: 8,
+        //height: '70%',
+        //backgroundColor: 'red'
+    },
+    dropdownList: {
+        color: 'red'
     }
 })

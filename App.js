@@ -67,7 +67,7 @@ export default function App() {
                 <TabView value={index} onChange={setIndex} animationType="timing" containerStyle={styles.tabView}>
                   <TabView.Item>
                     {index == 0 ? <Text>Placeholder</Text> : <></>}
-                  </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, flexShrink: 0 }}>
+                  </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, width: '100%' }}>
                     {index == 1 ? <TaskDetails id={id} editMode={editMode} /> : <></>}
                   </TabView.Item><TabView.Item>
                     {index == 2 ? <Text>Placeholder 3</Text> : <></>}
