@@ -1,16 +1,39 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Card, Chip, FAB, TextInput } from 'react-native-paper';
+import { Card, Chip, FAB, TextInput, List } from 'react-native-paper';
 import { useState, useEffect } from 'react';
+import SelectDropdown from "react-native-select-dropdown";
+import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 
 export default function TaskDetails({ id, editMode }) {
 
     const [task, setTask] = useState({});
+    const [statuses, setStatuses] = useState([]);
+    const [status, setStatus] = useState('');
+    const [types, setTypes] = useState([]);
+    const [type, setType] = useState('');
+    const [commissions, setCommissions] = useState([]);
+    const [commission, setCommission] = useState('');
+    const [tickets, setTickets] = useState([]);
+    const [ticket, setTicket] = useState('');
+    const [customers, setCustomers] = useState([]);
+    const [customer, setCustomer] = useState('');
+    const [tags, setTags] = useState([]);
+    const [newTags, setNewTags] = useState([]);
+
 
     useEffect(() => {
         //forse serve aggiungere una schermatina di caricamento e/o del delay perché la tab non appaia vuota
         fetchData();
+
+        //retrieve dei dati per le tendine di modifica
+        fetchStatuses();
+        fetchTypes();
+        fetchCommissions();
+        fetchTickets();
+        fetchCustomers();
+        fetchTags();
     }, []);
 
     const fetchData = async () => {
@@ -44,6 +67,55 @@ export default function TaskDetails({ id, editMode }) {
         }
     }
 
+    const fetchStatuses = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/statuses');
+        console.log(res);
+        setStatuses(res);
+    }
+
+    const fetchTypes = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/types');
+        console.log(res);
+        setTypes(res);
+    }
+
+    const fetchCommissions = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/commissions');
+        console.log(res);
+        setTypes(res);
+    }
+
+    const fetchTickets = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/tickets');
+        console.log(res);
+        setTypes(res);
+    }
+
+    const fetchCustomers = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/customers');
+        console.log(res);
+        setTypes(res);
+    }
+
+    const fetchTags = async () => {
+        let res = await axios.get('https://gtr-express.onrender.com/tags');
+        console.log(res);
+        setTypes(res);
+    }
+
+    const data = [
+        { label: 'Item 1', value: '1' },
+        { label: 'Item 2', value: '2' },
+        { label: 'Item 3', value: '3' },
+        { label: 'Item 4', value: '4' },
+        { label: 'Item 5', value: '5' },
+        { label: 'Item 6', value: '6' },
+        { label: 'Item 7', value: '7' },
+        { label: 'Item 8', value: '8' },
+    ];
+
+    const [value, setValue] = useState(null);
+
     return (
         <ScrollView containerStyle={styles.detailsContainer}>
             <Text style={styles.taskTitle}>{task.ID} - {task.description}</Text>
@@ -51,12 +123,23 @@ export default function TaskDetails({ id, editMode }) {
                 <View style={styles.taskProperty}>
                     <Text style={styles.propertyLabel}>Stato</Text>
                     {editMode ?
-                        <View style={styles.inputContainer}>
-                            <TextInput style={styles.inputProperty} underlineColor='transparent' activeUnderlineColor='transparent' mode='flat' placeholder={task.status == '' ? 'Stato' : task.status} />
+                        <View style={{ width: '100%' }}>
+                            {/* <Dropdown style={{ width: '100%' }} data={data} placeholder="Prova" onChange={(item) => { setValue(item.value); }}
+                                value={value} /> */}
+                            {/* <SelectDropdown
+                                style={styles.propertyDropdown}
+                                defaultButtonText="Stato" data={data} rowTextForSelection={(item, index) => { return item.description }}
+                                onSelect={(item) => setStatus(item)} buttonTextAfterSelection={(item) => { return item.description }} /> */}
+                            {/* <List.Accordion
+                                title="Uncontrolled Accordion"
+                                style={styles.accordionSelector}>
+                                <List.Item title="First item" />
+                                <List.Item title="Second item" />
+                            </List.Accordion> */}
                         </View>
                         : <Chip style={styles.propertyChip}>{task.status}</Chip>}
                 </View>
-                <View style={styles.taskProperty}>
+                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Tipologia</Text>
                     <Chip style={styles.propertyChip}>{task.type}</Chip>
                     {/* <Text style={styles.property}>{task.type}</Text> */}
@@ -67,7 +150,7 @@ export default function TaskDetails({ id, editMode }) {
                     <Text style={styles.propertyLabel}>Commessa</Text>
                     <Chip style={styles.propertyChip}>{task.commission}</Chip>
                 </View>
-                <View style={styles.taskProperty}>
+                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Ticket</Text> {/*rendere dinamico il margine sx se il campo è vuoto*/}
                     <Chip style={styles.propertyChip}>{task.ticket}</Chip>
                 </View>
@@ -77,20 +160,18 @@ export default function TaskDetails({ id, editMode }) {
                     <Text style={styles.propertyLabel}>Cliente</Text>
                     <Chip style={styles.propertyChip}>{task.customer}</Chip>
                 </View>
-                <View style={styles.taskProperty}>
-                    <Text style={styles.propertyLabel}>CR</Text>
+                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
+                    <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>CR</Text>
                     <Chip style={styles.propertyChip}>{task.change_request}</Chip>
                 </View>
             </View>
-            <View style={{ flexDirection: 'row' }}>
-                <View style={styles.taskProperty}>
-                    <Text style={styles.propertyLabel}>Data Richiesta</Text>
-                    <Chip style={styles.propertyChip}>{task.date_request}</Chip>
-                </View>
-                <View style={styles.taskProperty}>
-                    <Text style={styles.propertyLabel}>Data Analisi</Text>
-                    <Chip style={styles.propertyChip}>{task.date_analysis}</Chip>
-                </View>
+            <View style={styles.taskProperty}>
+                <Text style={styles.propertyLabel}>Data Richiesta</Text>
+                <Chip style={styles.propertyChip}>{task.date_request}</Chip>
+            </View>
+            <View style={styles.taskProperty}>
+                <Text style={styles.propertyLabel}>Data Analisi</Text>
+                <Chip style={styles.propertyChip}>{task.date_analysis}</Chip>
             </View>
             {/* <View style={{ flexDirection: 'row' }}> */}
             <View style={styles.taskProperty}>
@@ -128,7 +209,6 @@ export default function TaskDetails({ id, editMode }) {
                 <Text style={styles.propertyLabel}>Note</Text>
                 <Text style={styles.taskNotex}>{task.notes}</Text>
             </View>
-            <Text style={{ flexWrap: 'wrap', flexShrink: 1, flex: 1, maxWidth: '15%', marginRight: 10 }}>Placeholder Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec blandit porta ex, at ultrices turpis lobortis nec. Aliquam non purus accumsan, molestie eros eget, malesuada libero. Vivamus id neque molestie ligula feugiat pulvinar. Vestibulum ut lacus a magna fringilla rutrum non a lectus. Sed iaculis sed ligula a fermentum. Nunc porttitor lacus pulvinar arcu tempus, in tristique nisi commodo. Suspendisse et iaculis justo, quis dictum augue. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Phasellus consectetur nunc ac arcu varius, vel iaculis turpis tristique. Proin gravida congue ex, id volutpat felis laoreet eu. Interdum et malesuada fames ac ante ipsum primis in faucibus. Etiam ipsum dolor, faucibus nec ipsum iaculis, pellentesque egestas leo. Aenean id ex in urna imperdiet aliquam.</Text>
         </ScrollView>
 
     )
@@ -151,7 +231,7 @@ const styles = StyleSheet.create({
     },
     taskProperty: {
         flexDirection: 'row',
-        marginVertical: 5
+        marginVertical: 5,
     },
     propertyLabel: {
         fontSize: 16,
@@ -168,8 +248,22 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         height: '80%',
         width: '90%'
-    }, inputContainer: {
-        borderRadius: 20,
+    },
+    inputContainer: {
+        // borderRadius: 20,
+        // width: '80%',
+        backgroundColor: 'white',
+        // height: '70%'
+    },
+    accordionSelector: {
+        borderRadius: 15,
+        // position: 'absolute',
+        // left: '50%'
         width: '80%',
+        height: '70%'
+    },
+    propertyDropdown: {
+        height: '70%',
+        backgroundColor: 'red'
     }
 })
