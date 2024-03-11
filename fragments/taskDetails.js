@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, ScrollView } from 'react-native';
-import { Card, Chip, FAB, TextInput, List } from 'react-native-paper';
+import { Card, Chip, FAB, TextInput, List, Button } from 'react-native-paper';
 import { useState, useEffect } from 'react';
 import SelectDropdown from "react-native-select-dropdown";
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
+import { DatePickerInput } from 'react-native-paper-dates';
+import { Input } from '@rneui/themed';
 
 export default function TaskDetails({ id, editMode }) {
 
@@ -21,6 +23,12 @@ export default function TaskDetails({ id, editMode }) {
     const [customer, setCustomer] = useState('');
     const [tags, setTags] = useState([]);
     const [newTags, setNewTags] = useState([]);
+    const [dateRequest, setDateRequest] = useState(undefined);
+    const [dateAnalysis, setDateAnalysis] = useState(undefined);
+    const [dateStart, setDateStart] = useState(undefined);
+    const [datePlanned, setDatePlanned] = useState(undefined);
+    const [dateEffective, setDateEffective] = useState(undefined);
+    const [newTag, setNewTag] = useState('');
 
 
     useEffect(() => {
@@ -82,25 +90,44 @@ export default function TaskDetails({ id, editMode }) {
     const fetchCommissions = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/commissions');
         console.log(res.data);
-        setTypes(res.data);
+        setCommissions(res.data);
     }
 
     const fetchTickets = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tickets');
         console.log(res.data);
-        setTypes(res.data);
+        // setTickets(res.data);
     }
 
     const fetchCustomers = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/customers');
-        console.log(res.data);
-        setTypes(res.data);
+        // setCustomers(res.data);
     }
 
     const fetchTags = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tags');
         console.log(res.data);
-        setTypes(res.data);
+        // setTags(res.data);
+        // setNewTags(res.data);
+    }
+
+    const handleAddTag = () => {
+        if (newTag.trim() !== '') {
+            setNewTags([...tags, newTag.trim()]);
+            setNewTag('');
+            console.log(newTag);
+            console.log("tag added?");
+        }
+        // console.log(tags)
+    }
+
+    const handleRemoveTag = (tag) => {
+        const updatedTags = newTags.filter((t) => t !== tag);
+        setNewTags(updatedTags);
+    };
+
+    const onSaveChanges = () => {
+        alert(status.description);
     }
 
 
@@ -147,7 +174,7 @@ export default function TaskDetails({ id, editMode }) {
                         </View>
                         : <Chip style={styles.propertyChip}>{task.status}</Chip>}
                 </View>
-                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
+                <View style={[styles.taskProperty, { left: 295, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Tipologia</Text>
                     {editMode ? <View style={{ width: '100%', minWidth: '80%' }}><Dropdown
                         itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
@@ -156,74 +183,135 @@ export default function TaskDetails({ id, editMode }) {
                         itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
                         style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={types} placeholder="Tipologia" onChange={(item) => { setValue(item.value); }}
                         value={type} labelField='text' valueField='ID' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
-                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 692 }]} /></View> : <Chip style={styles.propertyChip}>{task.type}</Chip>
+                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 708 }]} /></View> : <Chip style={styles.propertyChip}>{task.type}</Chip>
                     }
                 </View>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <View style={styles.taskProperty}>
                     <Text style={styles.propertyLabel}>Commessa</Text>
-                    <Chip style={styles.propertyChip}>{task.commission}</Chip>
+                    {editMode ? <View style={{ width: '100%', minWidth: '80%' }}><Dropdown
+                        itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+                        selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+                        selectedTextProps={{ numberOfLines: 1 }}
+                        itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={commissions} placeholder="Commessa" onChange={(item) => { setValue(item.value); }}
+                        value={commission} labelField='commission' valueField='commission' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 386 }]} /></View> :
+                        <Chip style={styles.propertyChip}>{task.commission}</Chip>}
                 </View>
-                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
+                <View style={[styles.taskProperty, { left: 295, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>Ticket</Text> {/*rendere dinamico il margine sx se il campo è vuoto*/}
-                    <Chip style={styles.propertyChip}>{task.ticket}</Chip>
+                    {editMode ? <View style={{ width: '100%', minWidth: '80%' }}><Dropdown
+                        itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+                        selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+                        selectedTextProps={{ numberOfLines: 1 }}
+                        itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={tickets} placeholder="Ticket" onChange={(item) => { setValue(item.value); }}
+                        value={ticket} labelField='ticket' valueField='ticket' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 680 }]} /></View> :
+                        <Chip style={styles.propertyChip}>{task.ticket}</Chip>}
                 </View>
             </View>
             <View style={{ flexDirection: 'row' }}>
                 <View style={styles.taskProperty}>
                     <Text style={styles.propertyLabel}>Cliente</Text>
-                    <Chip style={styles.propertyChip}>{task.customer}</Chip>
+                    {editMode ? <View style={{ width: '100%', minWidth: '80%' }}><Dropdown
+                        itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+                        selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+                        selectedTextProps={{ numberOfLines: 1 }}
+                        itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={customers} placeholder="Cliente" onChange={(item) => { setValue(item.value); }}
+                        value={customer} labelField='nome' valueField='nome' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+                        containerStyle={[styles.dropdownList, { borderRadius: 15, left: 356 }]} /></View> :
+                        <Chip style={styles.propertyChip}>{task.customer}</Chip>}
                 </View>
-                <View style={[styles.taskProperty, { left: 280, position: 'absolute' }]}>
+                <View style={[styles.taskProperty, { left: 295, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>CR</Text>
-                    <Chip style={styles.propertyChip}>{task.change_request}</Chip>
+                    {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
+                        contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                        : <Chip style={styles.propertyChip}>{task.change_request}</Chip>}
                 </View>
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Data Richiesta</Text>
-                <Chip style={styles.propertyChip}>{task.date_request}</Chip>
+                {editMode ? <DatePickerInput locale='it' label='Data Richiesta' value={dateRequest} onChange={(d) => setDateRequest(d)} inputMode='start'
+                    underlineColor='transparent' activeUnderlineColor='transparent'
+                    style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
+                    contentStyle={{ maxHeight: '80%' }} underlineStyle={{ color: 'transparent' }} />
+                    : <Chip style={styles.propertyChip}>{task.date_request}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Data Analisi</Text>
-                <Chip style={styles.propertyChip}>{task.date_analysis}</Chip>
+                {editMode ? <DatePickerInput locale='it' label='Data Analisi' value={dateAnalysis} onChange={(d) => setDateAnalysis(d)} inputMode='start'
+                    style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} /> :
+                    <Chip style={styles.propertyChip}>{task.date_analysis}</Chip>}
             </View>
             {/* <View style={{ flexDirection: 'row' }}> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Inizio Sviluppi</Text>
-                <Chip style={styles.propertyChip}>{task.dev_start}</Chip>
+                {editMode ? <DatePickerInput locale='it' label='Data Inizio Sviluppi' value={dateStart} onChange={(d) => setDateStart(d)} inputMode='start'
+                    style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} />
+                    : <Chip style={styles.propertyChip}>{task.dev_start}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Rilascio Pianificato</Text>
-                <Chip style={styles.propertyChip}>{task.planned_release}</Chip>
+                {editMode ? <DatePickerInput locale='it' label='Data Rilascio Pianificato' value={datePlanned} onChange={(d) => setDatePlanned(d)} inputMode='start'
+                    style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} />
+                    : <Chip style={styles.propertyChip}>{task.planned_release}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Rilascio Effettivo</Text>
-                <Chip style={styles.propertyChip}>{task.release}</Chip>
+                {editMode ? <DatePickerInput locale='it' label='Data Rilascio Effettivo' value={dateEffective} onChange={(d) => setDateEffective(d)} inputMode='start'
+                    style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} />
+                    : <Chip style={styles.propertyChip}>{task.release}</Chip>}
             </View>
             {/* </View> */}
             {/* <View style={{ flexDirection: 'row' }}> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Stimato</Text>
-                <Chip style={styles.propertyChip}>{task.estimated_time}</Chip>
+                {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    : <Chip style={styles.propertyChip}>{task.estimated_time}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Effettivo</Text>
-                <Chip style={styles.propertyChip}>{task.actual_time}</Chip>
+                {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    : <Chip style={styles.propertyChip}>{task.actual_time}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Consuntivabile</Text>
-                <Chip style={styles.propertyChip}>{task.billable_time}</Chip>
+                {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    : <Chip style={styles.propertyChip}>{task.billable_time}</Chip>}
             </View>
             {/* </View> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tags</Text>
-                <Chip style={styles.propertyChip}>TEMP</Chip>
+                {editMode ? <View style={{ maxWidth: '90%' }}><Input
+                    placeholder="Aggiungi tags..."
+                    value={newTag}
+                    onChangeText={(text) => setNewTag(text)}
+                    onSubmitEditing={handleAddTag}></Input></View> : <></>}
+                {newTags.map((tag) => (
+                    <Chip
+                        key={tag}
+                        title={tag}
+                        type="flat"
+                        onPress={() => handleRemoveTag(tag)}
+                        icon='close'
+                        disabled={!editMode}
+                        textStyle={{ color: 'Black' }}
+                        style={[{ color: '#fff', marginHorizontal: '0.3%', maxHeight: '70%' }, styles.propertyChip]}
+                    >{tag}</Chip>))}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Note</Text>
-                <Text style={styles.taskNotex}>{task.notes}</Text>
+                {editMode ? <TextInput numberOfLines={2} mode='outlined' style={{ minWidth: '75%' }} />
+                    : <Text style={styles.taskNotex}>{task.notes}</Text>}
             </View>
+            {editMode ? <Button onPress={onSaveChanges} style={{ maxWidth: '85%' }}>Save</Button> : <></>}
         </ScrollView>
 
     )
