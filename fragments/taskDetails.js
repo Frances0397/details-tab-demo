@@ -12,15 +12,15 @@ export default function TaskDetails({ id, editMode }) {
 
     const [task, setTask] = useState({});
     const [statuses, setStatuses] = useState([]);
-    const [status, setStatus] = useState('');
+    const [status, setStatus] = useState({});
     const [types, setTypes] = useState([]);
-    const [type, setType] = useState('');
+    const [type, setType] = useState({});
     const [commissions, setCommissions] = useState([]);
-    const [commission, setCommission] = useState('');
+    const [commission, setCommission] = useState({});
     const [tickets, setTickets] = useState([]);
-    const [ticket, setTicket] = useState('');
+    const [ticket, setTicket] = useState({});
     const [customers, setCustomers] = useState([]);
-    const [customer, setCustomer] = useState('');
+    const [customer, setCustomer] = useState({});
     const [tags, setTags] = useState([]);
     const [newTags, setNewTags] = useState([]);
     const [dateRequest, setDateRequest] = useState(undefined);
@@ -71,6 +71,9 @@ export default function TaskDetails({ id, editMode }) {
             obj.notes = response.data[0].notes;
 
             console.log(obj.ID);
+            console.log("test tags");
+            console.log(obj.tags);
+            setNewTags(obj.tags);
             setTask(obj);
         }
     }
@@ -96,24 +99,45 @@ export default function TaskDetails({ id, editMode }) {
     const fetchTickets = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tickets');
         console.log(res.data);
-        // setTickets(res.data);
+        setTickets(res.data);
     }
 
     const fetchCustomers = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/customers');
-        // setCustomers(res.data);
+        setCustomers(res.data);
     }
 
     const fetchTags = async () => {
         let res = await axios.get('https://gtr-express.onrender.com/tags');
         console.log(res.data);
-        // setTags(res.data);
+        setTags(res.data);
         // setNewTags(res.data);
+    }
+
+    const checkTags = () => {
+        var allTags = []
+        tags.map((el) => {
+            allTags.push(el.tag.trim())
+        })
+        allTags.map((val) => {
+            console.log(val)
+            newTags.map((tag, index) => {
+                if (val == tag) {
+                    console.log(tag)
+                    return false
+                } else {
+                    console.log('Nuovo Tag!!')
+                    return true
+                }
+            })
+        })
+
     }
 
     const handleAddTag = () => {
         if (newTag.trim() !== '') {
-            setNewTags([...tags, newTag.trim()]);
+            setNewTags([...newTags, newTag.trim()]);
+            checkTags();
             setNewTag('');
             console.log(newTag);
             console.log("tag added?");
@@ -158,19 +182,9 @@ export default function TaskDetails({ id, editMode }) {
                                 selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
                                 selectedTextProps={{ numberOfLines: 1 }}
                                 itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
-                                style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={statuses} placeholder="Stato" onChange={(item) => { setValue(item.value); }}
+                                style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={statuses} placeholder="Stato" onChange={(item) => { setValue(item.value); setStatus(item); }}
                                 value={status} labelField='description' valueField='ID' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
                                 containerStyle={[styles.dropdownList, { borderRadius: 15, left: 342 }]} />
-                            {/* <SelectDropdown
-                                style={styles.propertyDropdown}
-                                defaultButtonText="Stato" data={data} rowTextForSelection={(item, index) => { return item.description }}
-                                onSelect={(item) => setStatus(item)} buttonTextAfterSelection={(item) => { return item.description }} /> */}
-                            {/* <List.Accordion
-                                title="Uncontrolled Accordion"
-                                style={styles.accordionSelector}>
-                                <List.Item title="First item" />
-                                <List.Item title="Second item" />
-                            </List.Accordion> */}
                         </View>
                         : <Chip style={styles.propertyChip}>{task.status}</Chip>}
                 </View>
@@ -181,7 +195,7 @@ export default function TaskDetails({ id, editMode }) {
                         selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
                         selectedTextProps={{ numberOfLines: 1 }}
                         itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
-                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={types} placeholder="Tipologia" onChange={(item) => { setValue(item.value); }}
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={types} placeholder="Tipologia" onChange={(item) => { setValue(item.value); setType(item); }}
                         value={type} labelField='text' valueField='ID' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
                         containerStyle={[styles.dropdownList, { borderRadius: 15, left: 708 }]} /></View> : <Chip style={styles.propertyChip}>{task.type}</Chip>
                     }
@@ -195,7 +209,7 @@ export default function TaskDetails({ id, editMode }) {
                         selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
                         selectedTextProps={{ numberOfLines: 1 }}
                         itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
-                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={commissions} placeholder="Commessa" onChange={(item) => { setValue(item.value); }}
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={commissions} placeholder="Commessa" onChange={(item) => { setValue(item.value); setCommission(item) }}
                         value={commission} labelField='commission' valueField='commission' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
                         containerStyle={[styles.dropdownList, { borderRadius: 15, left: 386 }]} /></View> :
                         <Chip style={styles.propertyChip}>{task.commission}</Chip>}
@@ -207,7 +221,7 @@ export default function TaskDetails({ id, editMode }) {
                         selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
                         selectedTextProps={{ numberOfLines: 1 }}
                         itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
-                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={tickets} placeholder="Ticket" onChange={(item) => { setValue(item.value); }}
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={tickets} placeholder="Ticket" onChange={(item) => { setValue(item.value); setTicket(item); }}
                         value={ticket} labelField='ticket' valueField='ticket' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
                         containerStyle={[styles.dropdownList, { borderRadius: 15, left: 680 }]} /></View> :
                         <Chip style={styles.propertyChip}>{task.ticket}</Chip>}
@@ -221,7 +235,7 @@ export default function TaskDetails({ id, editMode }) {
                         selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
                         selectedTextProps={{ numberOfLines: 1 }}
                         itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
-                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={customers} placeholder="Cliente" onChange={(item) => { setValue(item.value); }}
+                        style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200 }]} data={customers} placeholder="Cliente" onChange={(item) => { setValue(item.value); setCustomer(item); }}
                         value={customer} labelField='nome' valueField='nome' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
                         containerStyle={[styles.dropdownList, { borderRadius: 15, left: 356 }]} /></View> :
                         <Chip style={styles.propertyChip}>{task.customer}</Chip>}
@@ -229,7 +243,8 @@ export default function TaskDetails({ id, editMode }) {
                 <View style={[styles.taskProperty, { left: 295, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>CR</Text>
                     {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
-                        contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                        contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'
+                        onChangeText={() => { alert("CR") }}></TextInput>
                         : <Chip style={styles.propertyChip}>{task.change_request}</Chip>}
                 </View>
             </View>
@@ -247,7 +262,6 @@ export default function TaskDetails({ id, editMode }) {
                     style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} /> :
                     <Chip style={styles.propertyChip}>{task.date_analysis}</Chip>}
             </View>
-            {/* <View style={{ flexDirection: 'row' }}> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Inizio Sviluppi</Text>
                 {editMode ? <DatePickerInput locale='it' label='Data Inizio Sviluppi' value={dateStart} onChange={(d) => setDateStart(d)} inputMode='start'
@@ -266,8 +280,6 @@ export default function TaskDetails({ id, editMode }) {
                     style={{ maxWidth: '65%', height: '80%', borderRadius: 15, borderTopRightRadius: 15, borderTopLeftRadius: 15 }} />
                     : <Chip style={styles.propertyChip}>{task.release}</Chip>}
             </View>
-            {/* </View> */}
-            {/* <View style={{ flexDirection: 'row' }}> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Stimato</Text>
                 {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
@@ -286,7 +298,6 @@ export default function TaskDetails({ id, editMode }) {
                     contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
                     : <Chip style={styles.propertyChip}>{task.billable_time}</Chip>}
             </View>
-            {/* </View> */}
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tags</Text>
                 {editMode ? <View style={{ maxWidth: '90%' }}><Input
@@ -294,6 +305,8 @@ export default function TaskDetails({ id, editMode }) {
                     value={newTag}
                     onChangeText={(text) => setNewTag(text)}
                     onSubmitEditing={handleAddTag}></Input></View> : <></>}
+            </View>
+            <View style={{ flexDirection: 'row' }}>
                 {newTags.map((tag) => (
                     <Chip
                         key={tag}
@@ -303,7 +316,7 @@ export default function TaskDetails({ id, editMode }) {
                         icon='close'
                         disabled={!editMode}
                         textStyle={{ color: 'Black' }}
-                        style={[{ color: '#fff', marginHorizontal: '0.3%', maxHeight: '70%' }, styles.propertyChip]}
+                        style={[{ color: '#fff', marginHorizontal: '0.3%', marginBottom: 15, maxWidth: 100 }, styles.propertyChip]}
                     >{tag}</Chip>))}
             </View>
             <View style={styles.taskProperty}>
