@@ -29,6 +29,11 @@ export default function TaskDetails({ id, editMode }) {
     const [datePlanned, setDatePlanned] = useState(undefined);
     const [dateEffective, setDateEffective] = useState(undefined);
     const [newTag, setNewTag] = useState('');
+    const [CR, setCR] = useState('');
+    const [estTime, setEstTime] = useState('');
+    const [effTime, setEffTime] = useState('');
+    const [billTime, setBillTime] = useState('');
+    const [notes, setNotes] = useState('');
 
 
     useEffect(() => {
@@ -70,10 +75,26 @@ export default function TaskDetails({ id, editMode }) {
             obj.tags = response.data[0].tags;
             obj.notes = response.data[0].notes;
 
+            let responseRaw = await axios.get(`https://gtr-express.onrender.com/task/raw/${id}`);
+
             console.log(obj.ID);
             console.log("test tags");
             console.log(obj.tags);
+            setType({ ID: responseRaw.data[0].type_id });
+            setStatus({ ID: responseRaw.data[0].status });
+            setCommission(obj.commission);
+            setTicket(obj.ticket);
+            setCustomer(obj.customer);
+            // setDateAnalysis(new Date(obj.date_analysis));
+            // setDateEffective(new Date(obj.release));
+            // setDatePlanned(new Date(obj.planned_release));
+            // setDateRequest(new Date(obj.date_request));
+            // setDateStart(new Date(obj.dev_start));
             setNewTags(obj.tags);
+            setCR(obj.change_request);
+            setEstTime(obj.estimated_time);
+            setEffTime(obj.actual_time);
+            setBillTime(obj.billable_time);
             setTask(obj);
         }
     }
@@ -151,7 +172,71 @@ export default function TaskDetails({ id, editMode }) {
     };
 
     const onSaveChanges = () => {
-        alert(status.description);
+        alert(CR);
+        console.log(newTags);
+
+        let updatedTask = {};
+        updatedTask.description = task.description;
+        updatedTask.type_id = type.ID;
+        updatedTask.status = status.ID;
+        updatedTask.commission = commission;
+        updatedTask.ticket = ticket;
+        updatedTask.customer = customer;
+        updatedTask.change_request = [CR];
+        updatedTask.date_requested = dateRequest;
+        updatedTask.date_analysis = dateAnalysis;
+        updatedTask.dev_start = dateStart;
+        updatedTask.planned_release = datePlanned;
+        updatedTask.release = dateEffective;
+        //TODO: check if time variable are atually integers
+        updatedTask.estimated_time = parseInt(estTime);
+        updatedTask.actual_time = parseInt(effTime);
+        updatedTask.billable_time = parseInt(billTime);
+        updatedTask.tags = newTags;
+        updatedTask.notes = notes;
+
+        console.log(updatedTask);
+
+        let tagsResponse = addNewTags();
+        console.log(tagsResponse);
+        let response = updateTask(updatedTask);
+
+    }
+
+    updateTask = async (updatedTask) => {
+        let result = await axios.put(`https://gtr-express.onrender.com/task/${id}`, updatedTask);
+        console.log(result);
+
+        return "ciao";
+    }
+
+    addNewTags = async () => {
+
+        let oldTags = [];
+        for (let i = 0; i < tags.length; i++) {
+            oldTags.push(tags[i].tag.trim());
+        }
+
+        const addTags = newTags.filter(element => !oldTags.includes(element));
+        console.log("nuovi tag");
+        console.log(addTags);
+
+        let newTagObject = [];
+        for (let j = 0; j < addTags.length; j++) {
+            newTagObject.push({ tag: addTags[j], description: "" });
+        }
+
+        console.log(newTagObject);
+
+        if (newTagObject.length > 0) {
+
+            let result = await axios.post(`https://gtr-express.onrender.com/tags`, newTagObject);
+
+            return result;
+
+        } else {
+            return 0;
+        }
     }
 
 
@@ -243,9 +328,9 @@ export default function TaskDetails({ id, editMode }) {
                 <View style={[styles.taskProperty, { left: 295, position: 'absolute' }]}>
                     <Text style={[styles.propertyLabel, { marginLeft: 35 }]}>CR</Text>
                     {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
-                        contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'
-                        onChangeText={() => { alert("CR") }}></TextInput>
-                        : <Chip style={styles.propertyChip}>{task.change_request}</Chip>}
+                        contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent' value={CR}
+                        onChangeText={(CR) => { setCR(CR); }}></TextInput>
+                        : <Chip style={styles.propertyChip}>{CR}</Chip>}
                 </View>
             </View>
             <View style={styles.taskProperty}>
@@ -283,19 +368,22 @@ export default function TaskDetails({ id, editMode }) {
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Stimato</Text>
                 {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
-                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'
+                    value={estTime} onChangeText={(estTime) => setEstTime(estTime)}></TextInput>
                     : <Chip style={styles.propertyChip}>{task.estimated_time}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Effettivo</Text>
                 {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
-                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'
+                    value={effTime} onChangeText={(effTime) => setEffTime(effTime)}></TextInput>
                     : <Chip style={styles.propertyChip}>{task.actual_time}</Chip>}
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Tempo Consuntivabile</Text>
                 {editMode ? <TextInput style={{ borderRadius: 15, height: '85%', borderTopRightRadius: 15, borderTopLeftRadius: 15 }}
-                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'></TextInput>
+                    contentStyle={{ height: '80%' }} underlineColor='transparent' activeUnderlineColor='transparent'
+                    value={billTime} onChangeText={(billTime) => setBillTime(billTime)}></TextInput>
                     : <Chip style={styles.propertyChip}>{task.billable_time}</Chip>}
             </View>
             <View style={styles.taskProperty}>
@@ -303,7 +391,7 @@ export default function TaskDetails({ id, editMode }) {
                 {editMode ? <View style={{ maxWidth: '90%' }}><Input
                     placeholder="Aggiungi tags..."
                     value={newTag}
-                    onChangeText={(text) => setNewTag(text)}
+                    onChangeText={(text) => setNewTag(text.toUpperCase())}
                     onSubmitEditing={handleAddTag}></Input></View> : <></>}
             </View>
             <View style={{ flexDirection: 'row' }}>
@@ -321,7 +409,8 @@ export default function TaskDetails({ id, editMode }) {
             </View>
             <View style={styles.taskProperty}>
                 <Text style={styles.propertyLabel}>Note</Text>
-                {editMode ? <TextInput numberOfLines={2} mode='outlined' style={{ minWidth: '75%' }} />
+                {editMode ? <TextInput numberOfLines={2} mode='outlined' style={{ minWidth: '75%' }}
+                    value={notes} onChangeText={(notes) => setNotes(notes)} />
                     : <Text style={styles.taskNotex}>{task.notes}</Text>}
             </View>
             {editMode ? <Button onPress={onSaveChanges} style={{ maxWidth: '85%' }}>Save</Button> : <></>}
