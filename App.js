@@ -39,6 +39,7 @@ export default function App() {
   const [position, setPosition] = useState("");
   const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("");
+  const [refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     fetchPositions();
@@ -71,7 +72,7 @@ export default function App() {
 
     console.log(docObj);
     postDoc(docObj);
-
+    setRefresh(!refresh);
   }
 
   const postDoc = async (obj) => {
@@ -139,7 +140,7 @@ export default function App() {
                   </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, width: '100%' }}>
                     {index == 1 ? <TaskDetails id={id} editMode={editMode} /> : <></>}
                   </TabView.Item><TabView.Item>
-                    {index == 2 ? <TaskDocuments id={id} /> : <></>}
+                    {index == 2 ? <TaskDocuments id={id} refresh={refresh} /> : <></>}
                   </TabView.Item>
                 </TabView>
                 {index == 0 ? <FAB
