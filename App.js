@@ -228,7 +228,85 @@ export default function App() {
           <Button onPress={() => saveDoc()}>Save</Button>
         </Dialog.Actions>
       </Dialog>
-    </SafeAreaProvider>
+      <Dialog>
+        <Dialog.Title style={styles.titleText}>Nuovo Sotto-Task</Dialog.Title>
+        <Dialog.Content style={{ alignSelf: 'center', maxHeight: 700, minHeight: 300, width: '90%', height: '80%' }}>
+          <TextInput
+            textColor={colors.text}
+            label="Descrizione*"
+            value={taskDescription}
+            onChangeText={taskDescription => setDescription(taskDescription)}
+            style={{
+              backgroundColor: colors.border,
+              marginVertical: '1%',
+              borderRadius: 15,
+              borderTopLeftRadius: 15,
+              borderTopRightRadius: 15,
+            }}
+          />
+          <View style={styles.horizontalContainer}>
+            {drop(subTaskTypes, 'Tipo sotto-task')}
+            {drop(resources, 'Risorsa')}
+            {drop(resourceTypes, 'Tipo Risorsa')}
+          </View>
+          <View style={styles.horizontalContainer}>
+            <DatePickerInput
+              activeUnderlineColor={colors.text}
+              cursorColor={colors.text}
+              iconColor={colors.text}
+              activeOutlineColor={colors.text}
+              textColor={colors.text}
+              style={{
+                borderRadius: 15, borderTopLeftRadius: 15,
+                borderTopRightRadius: 15, backgroundColor: colors.border
+              }}
+              locale="it"
+              label="Data inizio sub-task"
+              value={start}
+              // onChange={(start) => {setStart(start); console.log(start)}}
+              onChange={(start) => setStart(start)}
+              inputMode="start"
+            />
+            <DatePickerInput
+              activeUnderlineColor={colors.text}
+              cursorColor={colors.text}
+              iconColor={colors.text}
+              activeOutlineColor={colors.text}
+              textColor={colors.text}
+              style={{
+                borderRadius: 15, borderTopLeftRadius: 15,
+                borderTopRightRadius: 15, backgroundColor: colors.border
+              }}
+              locale="it"
+              label="Data rilascio pianificato"
+              value={end}
+              onChange={(end) => setEnd(end)}
+              // onChange={(end) => onEndChange(end)}
+              inputMode="start"
+            />
+          </View>
+          <TextInput value={notes} onChangeText={(note) => setNotes(note)}
+            multiline={true} numberOfLines={3} placeholder="Note" mode='outlined'
+            style={[styles.textInputNote, { backgroundColor: colors.border }]} textColor={colors.text} />
+          <View style={styles.horizontalContainer}>
+            <TextInput placeholder='Tempo stimato*'
+              value={!estTime ? '' : estTime}
+              onChangeText={(estimTime) => setEstTime(estimTime)}
+              style={[styles.timeInput, { backgroundColor: colors.border }]}
+              textColor={colors.text} inputMode='numeric' />
+            <TextInput placeholder='Tempo consuntivabile'
+              value={!actualTime ? '' : actualTime}
+              onChangeText={(bill) => setActualTime(bill)}
+              style={[styles.timeInput, { backgroundColor: colors.border }]}
+              textColor={colors.text} inputMode='numeric' />
+          </View>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => { cleanFields(); method() }} >Close</Button>
+          <Button onPress={() => saveTask()}>Save</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </SafeAreaProvider >
   );
 }
 
