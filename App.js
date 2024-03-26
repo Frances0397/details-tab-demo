@@ -17,6 +17,9 @@ import { Button } from 'react-native-paper';
 import { Tab, TabView } from '@rneui/themed';
 import { AnimatedFAB } from 'react-native-paper';
 
+//subtask components TEMP
+import { DatePickerInput } from 'react-native-paper-dates';
+
 //Document popup components
 import { Dropdown } from 'react-native-element-dropdown';
 import { Dialog, TextInput } from 'react-native-paper';
@@ -41,10 +44,42 @@ export default function App() {
   const [category, setCategory] = useState("");
   const [refresh, setRefresh] = useState(false);
 
+  //variabili dialog sottotask
+  const [addSubtaskVisible, setAddSubtaskVisible] = useState(false);
+  const [subtaskDescription, setSubDescription] = useState("");
+  const [subTaskTypes, setSubTaskTypes] = useState([]);
+  const [subTaskType, setSubTaskType] = useState({})
+  const [resources, setResources] = useState([])
+  const [resource, setResource] = useState({});
+  const [resourceTypes, setResourceTypes] = useState([]);
+  const [resourceType, setResourceType] = useState({});
+  const [subStart, setSubStart] = useState(null);
+  const [subEnd, setSubEnd] = useState(null);
+  const [notes, setNotes] = useState("");
+  const [estTime, setEstTime] = useState("");
+  const [billTime, setBillTime] = useState("");
+
+
   useEffect(() => {
     fetchPositions();
     fetchDocCategory();
+    fetchSubTaskTypes();
+    fetchResources();
+    fetchResourceTypes();
   }, []);
+
+  const cleanFields = () => {
+    //pulizia campi
+    setSubDescription('');
+    setSubStart('');
+    setSubEnd('');
+    setNotes('');
+    setSubTaskType(null);
+    setResourceType(null);
+    setResource(null);
+    setBillTime(0);
+    setEstTime(0);
+  }
 
   const fetchDocCategory = async () => {
     let res = await axios.get('https://gtr-express.onrender.com/categories');
@@ -55,6 +90,34 @@ export default function App() {
     let res = await axios.get('https://gtr-express.onrender.com/positions');
     console.log(res.data);
     setPositions(res.data);
+  }
+
+  const fetchSubTaskTypes = async () => {
+    let res = await axios.get('https://gtr-express.onrender.com/subtask_types');
+    console.log(res.data);
+    setSubTaskTypes(res.data);
+  }
+
+  const fetchResources = async () => {
+    let res = await axios.get('https://gtr-express.onrender.com/resources');
+    console.log(res.data);
+
+    let resourcesArr = []
+    for (let i = 0; i < res.data.length; i++) {
+      let resourceObj = {}
+      resourceObj.name = res.data[i].name;
+      resourceObj.surname = res.data[i].surname;
+      resourceObj.fullname = res.data[i].name + ' ' + res.data[i].surname;
+      resourcesArr.push(resourceObj);
+    }
+
+    setResources(resourcesArr);
+  }
+
+  const fetchResourceTypes = async () => {
+    let res = await axios.get('https://gtr-express.onrender.com/resource_types');
+    console.log(res.data);
+    setResourceTypes(res.data);
   }
 
   const saveDoc = () => {
@@ -73,6 +136,46 @@ export default function App() {
     console.log(docObj);
     postDoc(docObj);
     setRefresh(!refresh);
+  }
+
+  const saveSubTask = () => {
+    let status = postSubTask();
+
+    if (status === 201 || status === 200) {
+      console.log("update task");
+      updateTask();
+    }
+  }
+
+  const postSubTask = async () => {
+    let subTask = {};
+
+    subTask.task_id = parseInt(id);
+    subTask.description = subtaskDescription;
+    subTask.notes = notes;
+    subTask.start_date = subStart;
+    subTask.planned_release = subEnd;
+    subTask.estimated_time = parseInt(estTime);
+    subTask.billable_time = parseInt(billTime);
+    subTask.resource = resource.name;
+    subTask.resource_type = resourceType.type;
+    subTask.type = parseInt(subTaskType.subtask_type_id);
+
+    console.log(subTask);
+    let res = await axios.post('https://gtr-express.onrender.com/subtask', subTask);
+    console.log(res);
+    return res.status;
+  }
+
+  const updateTask = async () => {
+    //fetch del task allo stato attuale
+    //sommo ai tempi del task i tempi nuovi
+    //aggiungo le persone nuove all'array delle persone - faccio la push del fullname nell'array
+    //faccio la put del tas
+  }
+
+  const fetchTask = async () => {
+
   }
 
   const postDoc = async (obj) => {
@@ -116,7 +219,7 @@ export default function App() {
           <ScrollView contentContainerStyle={styles.pageContainer}>
             <Card style={styles.ganttContainer}>
               <Text style={{ margin: 50 }}>Placeholder</Text>
-              <Button onPress={() => { setId(34); setIndex(0) }}>34</Button>
+              <Button onPress={() => { setId(56); setIndex(0) }}>56</Button>
               <Button onPress={() => { setId(38); setIndex(0) }}>38</Button>
             </Card>
             <View style={styles.bottomContainer}>
@@ -146,7 +249,7 @@ export default function App() {
                 {index == 0 ? <FAB
                   icon="plus"
                   style={styles.editButton}
-                  onPress={() => console.log('Pressed')}
+                  onPress={() => setAddSubtaskVisible(true)}
                 /> : <></>}
                 {index == 1 ? <FAB
                   icon={editMode ? "eye-outline" : "pencil-outline"}
@@ -228,16 +331,16 @@ export default function App() {
           <Button onPress={() => saveDoc()}>Save</Button>
         </Dialog.Actions>
       </Dialog>
-      <Dialog>
+      <Dialog visible={addSubtaskVisible}>
         <Dialog.Title style={styles.titleText}>Nuovo Sotto-Task</Dialog.Title>
         <Dialog.Content style={{ alignSelf: 'center', maxHeight: 700, minHeight: 300, width: '90%', height: '80%' }}>
           <TextInput
-            textColor={colors.text}
+            // textColor={colors.text}
             label="Descrizione*"
-            value={taskDescription}
-            onChangeText={taskDescription => setDescription(taskDescription)}
+            value={subtaskDescription}
+            onChangeText={subtaskDescription => setSubDescription(subtaskDescription)}
             style={{
-              backgroundColor: colors.border,
+              // backgroundColor: colors.border,
               marginVertical: '1%',
               borderRadius: 15,
               borderTopLeftRadius: 15,
@@ -245,65 +348,88 @@ export default function App() {
             }}
           />
           <View style={styles.horizontalContainer}>
-            {drop(subTaskTypes, 'Tipo sotto-task')}
-            {drop(resources, 'Risorsa')}
-            {drop(resourceTypes, 'Tipo Risorsa')}
+            <Dropdown
+              itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+              selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+              selectedTextProps={{ numberOfLines: 1 }}
+              itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+              style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200, marginHorizontal: 15 }]} data={subTaskTypes} placeholder="Tipo sotto-task" onChange={(item) => { setSubTaskType(item); }}
+              value={subTaskType} labelField='description' valueField='subtask_type_id' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+              containerStyle={[styles.dropdownList, { borderRadius: 15, left: 380 }]} />
+            <Dropdown
+              itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+              selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+              selectedTextProps={{ numberOfLines: 1 }}
+              itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+              style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200, marginHorizontal: 15 }]} data={resources} placeholder="Risorsa" onChange={(item) => { setResource(item); }}
+              value={resource} labelField='fullname' valueField='name' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+              containerStyle={[styles.dropdownList, { borderRadius: 15, left: 380 }]} />
+            <Dropdown
+              itemContainerStyle={{ borderRadius: 15, maxWidth: 200, overflow: 'hidden', flexWrap: 'nowrap', ellipsizeMode: 'tail' }}
+              selectedTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail', overflow: 'hidden' }}
+              selectedTextProps={{ numberOfLines: 1 }}
+              itemTextStyle={{ maxWidth: 200, flexWrap: 'nowrap', ellipsizeMode: 'tail' }} //overflow: 'hidden',
+              style={[styles.propertyDropdown, { width: '100%', flex: 1, maxWidth: 200, marginHorizontal: 15 }]} data={resourceTypes} placeholder="Tipo Risorsa" onChange={(item) => { setResourceType(item); }}
+              value={resourceType} labelField='type' valueField='type' dropdownPosition='bottom' showsVerticalScrollIndicator={false}
+              containerStyle={[styles.dropdownList, { borderRadius: 15, left: 380 }]} />
           </View>
           <View style={styles.horizontalContainer}>
             <DatePickerInput
-              activeUnderlineColor={colors.text}
-              cursorColor={colors.text}
-              iconColor={colors.text}
-              activeOutlineColor={colors.text}
-              textColor={colors.text}
+              //  activeUnderlineColor={colors.text}
+              //cursorColor={colors.text}
+              //iconColor={colors.text}
+              //activeOutlineColor={colors.text}
+              //textColor={colors.text}
               style={{
                 borderRadius: 15, borderTopLeftRadius: 15,
-                borderTopRightRadius: 15, backgroundColor: colors.border
+                borderTopRightRadius: 15,
+                //backgroundColor: colors.border
               }}
               locale="it"
               label="Data inizio sub-task"
-              value={start}
+              value={subStart}
               // onChange={(start) => {setStart(start); console.log(start)}}
-              onChange={(start) => setStart(start)}
+              onChange={(start) => setSubStart(start)}
               inputMode="start"
             />
             <DatePickerInput
-              activeUnderlineColor={colors.text}
-              cursorColor={colors.text}
-              iconColor={colors.text}
-              activeOutlineColor={colors.text}
-              textColor={colors.text}
+              // activeUnderlineColor={colors.text}
+              // cursorColor={colors.text}
+              // iconColor={colors.text}
+              // activeOutlineColor={colors.text}
+              // textColor={colors.text}
               style={{
                 borderRadius: 15, borderTopLeftRadius: 15,
-                borderTopRightRadius: 15, backgroundColor: colors.border
+                borderTopRightRadius: 15,
+                // backgroundColor: colors.border
               }}
               locale="it"
-              label="Data rilascio pianificato"
-              value={end}
-              onChange={(end) => setEnd(end)}
+              label="Data rilascio"
+              value={subEnd}
+              onChange={(end) => setSubEnd(end)}
               // onChange={(end) => onEndChange(end)}
               inputMode="start"
             />
           </View>
           <TextInput value={notes} onChangeText={(note) => setNotes(note)}
             multiline={true} numberOfLines={3} placeholder="Note" mode='outlined'
-            style={[styles.textInputNote, { backgroundColor: colors.border }]} textColor={colors.text} />
+            style={[styles.textInputNote, {}]} t />
           <View style={styles.horizontalContainer}>
             <TextInput placeholder='Tempo stimato*'
               value={!estTime ? '' : estTime}
               onChangeText={(estimTime) => setEstTime(estimTime)}
-              style={[styles.timeInput, { backgroundColor: colors.border }]}
-              textColor={colors.text} inputMode='numeric' />
+              style={[styles.timeInput, {}]}
+              inputMode='numeric' />
             <TextInput placeholder='Tempo consuntivabile'
-              value={!actualTime ? '' : actualTime}
-              onChangeText={(bill) => setActualTime(bill)}
-              style={[styles.timeInput, { backgroundColor: colors.border }]}
-              textColor={colors.text} inputMode='numeric' />
+              value={!billTime ? '' : billTime}
+              onChangeText={(bill) => setBillTime(bill)}
+              style={[styles.timeInput, {}]}
+              inputMode='numeric' />
           </View>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={() => { cleanFields(); method() }} >Close</Button>
-          <Button onPress={() => saveTask()}>Save</Button>
+          <Button onPress={() => { cleanFields(); setAddSubtaskVisible(false); }} >Close</Button>
+          <Button onPress={() => saveSubTask()}>Save</Button>
         </Dialog.Actions>
       </Dialog>
     </SafeAreaProvider >
