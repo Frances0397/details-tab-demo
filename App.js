@@ -140,11 +140,8 @@ export default function App() {
 
   const saveSubTask = () => {
     let status = postSubTask();
-
-    if (status === 201 || status === 200) {
-      console.log("update task");
-      updateTask();
-    }
+    console.log(status);
+    updateTask();
   }
 
   const postSubTask = async () => {
@@ -154,7 +151,7 @@ export default function App() {
     subTask.description = subtaskDescription;
     subTask.notes = notes;
     subTask.start_date = subStart;
-    subTask.planned_release = subEnd;
+    subTask.release = subEnd;
     subTask.estimated_time = parseInt(estTime);
     subTask.billable_time = parseInt(billTime);
     subTask.resource = resource.name;
@@ -169,9 +166,38 @@ export default function App() {
 
   const updateTask = async () => {
     //fetch del task allo stato attuale
+    let response = await axios.get(`https://gtr-express.onrender.com/task/raw/${id}`);
+    console.log(response.data[0]);
+
     //sommo ai tempi del task i tempi nuovi
+    let updatedTask = {};
+
+    updatedTask.estimated_time = response.data[0].estimated_time + parseInt(estTime);
+    updatedTask.billable_time = response.data[0].billable_time + parseInt(billTime);
+
+    console.log(resourceType);
+
     //aggiungo le persone nuove all'array delle persone - faccio la push del fullname nell'array
-    //faccio la put del tas
+    if (resourceType.type == 'Tecnico') {
+      let resourcesTemp = response.data[0].technical_resources;
+      console.log(resourcesTemp)
+      if (!resourcesTemp.includes(resource.fullname)) {
+        resourcesTemp.push(resource.fullname);
+        updatedTask.technical_resources = resourcesTemp.filter(str => str != '');
+      }
+    } else if (resourceType.type == 'Funzionale') {
+      let resourcesTemp = response.data[0].functional_resources;
+      console.log(resourcesTemp);
+      if (!resourcesTemp.includes(resource.fullname)) {
+        resourcesTemp.push(resource.fullname);
+        updatedTask.functional_resources = resourcesTemp.filter(str => str != '');
+      }
+    }
+
+    //faccio la put del task
+    console.log(updatedTask);
+    let update = await axios.put(`https://gtr-express.onrender.com/task/${id}`, updatedTask);
+    console.log(update);
   }
 
   const fetchTask = async () => {
