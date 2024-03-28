@@ -29,6 +29,7 @@ import axios from 'axios';
 //Inner components for sub tab
 import TaskDetails from './fragments/taskDetails';
 import TaskDocuments from './fragments/taskDocuments';
+import Subtask from './fragments/subtask';
 
 export default function App() {
   const [index, setIndex] = useState(0);
@@ -154,7 +155,7 @@ export default function App() {
     subTask.release = subEnd;
     subTask.estimated_time = parseInt(estTime);
     subTask.billable_time = parseInt(billTime);
-    subTask.resource = resource.name;
+    subTask.resource = resource.fullname;
     subTask.resource_type = resourceType.type;
     subTask.type = parseInt(subTaskType.subtask_type_id);
 
@@ -198,10 +199,6 @@ export default function App() {
     console.log(updatedTask);
     let update = await axios.put(`https://gtr-express.onrender.com/task/${id}`, updatedTask);
     console.log(update);
-  }
-
-  const fetchTask = async () => {
-
   }
 
   const postDoc = async (obj) => {
@@ -265,7 +262,7 @@ export default function App() {
                 </Tab>
                 <TabView value={index} onChange={setIndex} animationType="timing" containerStyle={styles.tabView}>
                   <TabView.Item>
-                    {index == 0 ? <Text>Placeholder</Text> : <></>}
+                    {index == 0 ? <Subtask id={id} /> : <></>}
                   </TabView.Item><TabView.Item style={{ margin: 10, marginHorizontal: 20, width: '100%' }}>
                     {index == 1 ? <TaskDetails id={id} editMode={editMode} /> : <></>}
                   </TabView.Item><TabView.Item>
